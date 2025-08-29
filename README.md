@@ -5,7 +5,7 @@ This project is a Flask-based web application designed for monitoring network de
 ## Project Structure
 
 ```
-wifi-monitoring-project/
+wifimon/
 ├── app/
 │   ├── static/                # CSS, JS, images for UI
 │   ├── templates/             # HTML Flask templates
@@ -30,8 +30,8 @@ wifi-monitoring-project/
 
 1. Clone the repository:
    ```
-   git clone https://github.com/adityakumarxd/wifi-monitoring-project.git
-   cd wifi-monitoring-project
+   git clone https://github.com/adityakumarxd/wifimon.git
+   cd wifimon
    ```
 
 2. Install the required dependencies:
