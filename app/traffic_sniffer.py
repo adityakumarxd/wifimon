@@ -1,37 +1,19 @@
-import socket
-import struct
-import binascii
+import threading
+from scapy.all import sniff, IP, TCP
+from flask import current_app
+from .socketio_server import notify_traffic
 
-class TrafficSniffer:
-    def __init__(self, interface):
-        self.interface = interface
-        self.sock = None
+def packet_callback(packet):
+    if packet.haslayer(IP) and packet.haslayer(TCP):
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        if packet[TCP].dport == 80 or packet[TCP].sport == 80:  # HTTP traffic only
+            info = {
+                'src_ip': ip_src,
+                'dst_ip': ip_dst,
+                'timestamp': packet.time
+            }
+            notify_traffic(info)
 
-    def start_sniffing(self):
-        self.sock = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
-        self.sock.bind((self.interface, 0))
-
-    def stop_sniffing(self):
-        if self.sock:
-            self.sock.close()
-            self.sock = None
-
-    def parse_packet(self, raw_data):
-        eth_header = raw_data[:14]
-        eth = struct.unpack('!6s6sH', eth_header)
-        dest_mac = binascii.hexlify(eth[0]).decode()
-        src_mac = binascii.hexlify(eth[1]).decode()
-        eth_protocol = eth[2]
-
-        return {
-            'dest_mac': dest_mac,
-            'src_mac': src_mac,
-            'protocol': eth_protocol,
-            'raw_data': raw_data
-        }
-
-    def sniff(self):
-        while True:
-            raw_data, addr = self.sock.recvfrom(65536)
-            packet = self.parse_packet(raw_data)
-            print(packet)  
+def start_sniffer():
+    sniff(filter="tcp port 80", prn=packet_callback, store=0)  # Non-blocking sniffing

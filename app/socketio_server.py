@@ -1,19 +1,5 @@
-from flask_socketio import SocketIO
+from app import socketio
+from flask_socketio import emit
 
-socketio = SocketIO()
-
-def init_socketio(app):
-    socketio.init_app(app)
-
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('Client disconnected')
-
-@socketio.on('message')
-def handle_message(data):
-    print('Received message: ' + data)
-    socketio.send('Message received')
+def notify_traffic(data):
+    socketio.emit('new_traffic', data, broadcast=True)

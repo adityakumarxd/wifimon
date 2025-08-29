@@ -1,27 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Detail</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
 
-    {% block content %}
-    <h1>Device Details</h1>
-    <div id="device-info">
-        <h2>{{ device.name }}</h2>
-        <p><strong>IP Address:</strong> {{ device.ip }}</p>
-        <p><strong>MAC Address:</strong> {{ device.mac }}</p>
-        <p><strong>Traffic Logs:</strong></p>
-        <ul>
-            {% for log in device.logs %}
-                <li>{{ log.timestamp }} - {{ log.details }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endblock %}
-</body>
-</html>
+{% block content %}
+<h2>Live Traffic for {{ device_ip }}</h2>
+<ul id="traffic-log"></ul>
+<script>
+    const socket = io();
+
+    socket.on('connect', () => {
+        console.log('Connected to server');
+    });
+
+    socket.on('new_traffic', data => {
+        if(data.src_ip === "{{ device_ip }}" || data.dst_ip === "{{ device_ip }}"){
+            const log = document.getElementById('traffic-log');
+            const item = document.createElement('li');
+            const time = new Date(data.timestamp * 1000).toLocaleTimeString();
+            item.textContent = `[${time}] Traffic from ${data.src_ip} to ${data.dst_ip}`;
+            log.prepend(item);
+        }
+    });
+</script>
+{% endblock %}

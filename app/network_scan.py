@@ -1,26 +1,19 @@
-import os
 import subprocess
+from flask import current_app
 
-def scan_network():
-    """
-    Scans the local network for devices and returns a list of IP addresses.
-    """
+def scan_network_devices():
+    subnet = current_app.config.get('NETWORK_SUBNET', '192.168.1.0/24')
+    devices = []
+
     try:
-        output = subprocess.check_output(['arp-scan', '-l']).decode('utf-8')
-        devices = []
-        for line in output.splitlines()[2:]:  
+        # Using arp-scan for scanning devices - arp-scan should be installed on system
+        result = subprocess.check_output(['arp-scan', '-l'], text=True)
+        for line in result.split('\n'):
             parts = line.split()
-            if len(parts) > 1:
-                devices.append(parts[0])  # first part = IP address
-        return devices
+            if len(parts) >= 2:
+                ip, mac = parts[0], parts[1]
+                devices.append({'ip': ip, 'mac': mac, 'hostname': ''})
     except Exception as e:
         print(f"Error scanning network: {e}")
-        return []
 
-def get_device_info(ip_address):
-    device_info = {
-        'ip_address': ip_address,
-        'hostname': os.popen(f'nslookup {ip_address}').read().strip(),
-        'status': 'active'  
-    }
-    return device_info
+    return devices

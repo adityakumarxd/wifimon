@@ -1,15 +1,19 @@
 from flask import Flask
+from flask_socketio import SocketIO
+from config import Config
+
+socketio = SocketIO()
 
 def create_app():
     app = Flask(__name__)
-    
-    # Load configuration
-    app.config.from_object('config')
+    app.config.from_object(Config)
 
-    # Import and register blueprints
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    socketio.init_app(app)
+
+    from .routes import main_bp
+    from .auth import auth_bp
+
+    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp)
 
     return app
-
-app = create_app()

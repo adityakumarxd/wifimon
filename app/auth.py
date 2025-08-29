@@ -1,36 +1,31 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
-from werkzeug.security import generate_password_hash, check_password_hash
-from app import db
+from flask import Blueprint, request, render_template, redirect, url_for, session, flash
+from functools import wraps
 
-auth = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__)
 
-@auth.route('/login', methods=['GET', 'POST'])
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('auth.login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = db.get_user(username)  
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            flash('Login successful!', category='success')
-            return redirect(url_for('dashboard'))
+        # Simple hardcoded check - replace with router creds or DB
+        if username == 'admin' and password == 'admin123':
+            session['user'] = username
+            return redirect(url_for('main.dashboard'))
         else:
-            flash('Login failed. Check your username and password.', category='error')
+            flash('Invalid credentials', 'danger')
     return render_template('login.html')
 
-@auth.route('/logout')
+@auth_bp.route('/logout')
+@login_required
 def logout():
-    session.pop('user_id', None)
-    flash('You have been logged out.', category='info')
+    session.pop('user', None)
     return redirect(url_for('auth.login'))
-
-@auth.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        hashed_password = generate_password_hash(password, method='sha256')
-        db.add_user(username, hashed_password)  
-        flash('Registration successful! You can now log in.', category='success')
-        return redirect(url_for('auth.login'))
-    return render_template('register.html') 

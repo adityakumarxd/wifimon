@@ -1,38 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</head>
-<body>
-    <header>
-        <h1>WiFi Monitoring Dashboard</h1>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="devices">
-            <h2>Connected Devices</h2>
-            <ul>
-                {% for device in devices %}
-                <li>
-                    <a href="{{ url_for('device_detail', device_id=device.id) }}">
-                        {{ device.name }} - {{ device.ip_address }}
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 WiFi Monitoring Project</p>
-    </footer>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Connected Devices</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>IP Address</th>
+        <th>MAC Address</th>
+        <th>Hostname</th>
+        <th>Details</th>
+    </tr>
+    {% for device in devices %}
+    <tr>
+        <td>{{ device.ip }}</td>
+        <td>{{ device.mac }}</td>
+        <td>{{ device.hostname or 'Unknown' }}</td>
+        <td><a href="{{ url_for('main.device_detail', ip=device.ip) }}">View Traffic</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

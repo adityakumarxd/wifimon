@@ -1,32 +1,24 @@
-from flask import render_template, redirect, url_for, request, flash
-from app import app
-from app.auth import login_required
-from app.network_scan import scan_network_devices
-from app.traffic_sniffer import start_sniffer
+from flask import Blueprint, render_template, redirect, url_for, session
+from flask_socketio import emit
+from .network_scan import scan_network_devices
+from .auth import login_required
+from flask import request
 
-@app.route('/')
-def home():
-    return render_template('login.html')
+main_bp = Blueprint('main', __name__)
 
-@app.route('/dashboard')
+@main_bp.route('/')
+def index():
+    if 'user' in session:
+        return redirect(url_for('main.dashboard'))
+    return redirect(url_for('auth.login'))
+
+@main_bp.route('/dashboard')
 @login_required
 def dashboard():
     devices = scan_network_devices()
     return render_template('dashboard.html', devices=devices)
 
-@app.route('/device/<device_id>')
+@main_bp.route('/device/<ip>')
 @login_required
-def device_detail(device_id):
-    traffic_logs = start_sniffer(device_id)
-    return render_template('device_detail.html', device_id=device_id, traffic_logs=traffic_logs)
-
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-    if authenticate_user(username, password):
-        flash('Login successful!', 'success')
-        return redirect(url_for('dashboard'))
-    else:
-        flash('Invalid credentials. Please try again.', 'danger')
-        return redirect(url_for('home'))
+def device_detail(ip):
+    return render_template('device_detail.html', device_ip=ip)
