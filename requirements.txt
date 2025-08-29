@@ -5,3 +5,4 @@ scapy==2.4.5
 pyshark
 python-nmap
 netifaces
+mac-vendor-lookup
