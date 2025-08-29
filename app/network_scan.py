@@ -6,13 +6,14 @@ def scan_network_devices():
     devices = []
 
     try:
-        # Using arp-scan for scanning devices - arp-scan should be installed on system
         result = subprocess.check_output(['arp-scan', '-l'], text=True)
-        for line in result.split('\n'):
+        lines = result.split('\n')
+        
+        for line in lines:
             parts = line.split()
             if len(parts) >= 2:
                 ip, mac = parts[0], parts[1]
-                devices.append({'ip': ip, 'mac': mac, 'hostname': ''})
+                devices.append({'ip': ip, 'mac': mac, 'hostname': 'Unknown'})
     except Exception as e:
         print(f"Error scanning network: {e}")
 

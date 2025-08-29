@@ -2,22 +2,39 @@
 
 {% block content %}
 <h2>Live Traffic for {{ device_ip }}</h2>
-<ul id="traffic-log"></ul>
+
+<input type="text" id="filterInput" placeholder="Filter requests..." oninput="filterRequests()" style="margin-bottom:10px; width:300px;">
+
+<ul id="traffic-log" style="list-style:none; padding-left:0;"></ul>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
 <script>
-    const socket = io();
+const deviceIP = "{{ device_ip }}";
+const socket = io();
 
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
+// Join the room for this device on connect
+socket.on('connect', () => {
+    socket.emit('join_room', deviceIP);
+});
 
-    socket.on('new_traffic', data => {
-        if(data.src_ip === "{{ device_ip }}" || data.dst_ip === "{{ device_ip }}"){
-            const log = document.getElementById('traffic-log');
-            const item = document.createElement('li');
-            const time = new Date(data.timestamp * 1000).toLocaleTimeString();
-            item.textContent = `[${time}] Traffic from ${data.src_ip} to ${data.dst_ip}`;
-            log.prepend(item);
-        }
-    });
+socket.on('new_traffic', data => {
+    const log = document.getElementById('traffic-log');
+    const item = document.createElement('li');
+    const time = new Date(data.timestamp * 1000).toLocaleTimeString();
+    item.textContent = `[${time}] ${data.method} ${data.path} --> ${data.dst_ip}`;
+    item.setAttribute('data-text', item.textContent.toLowerCase());
+    log.prepend(item);
+    filterRequests();
+});
+
+// Simple text filter
+function filterRequests(){
+    const input = document.getElementById('filterInput').value.toLowerCase();
+    const items = document.getElementById('traffic-log').children;
+    for(let i=0; i<items.length; i++){
+        const txt = items[i].getAttribute('data-text');
+        items[i].style.display = txt.includes(input) ? 'list-item' : 'none';
+    }
+}
 </script>
 {% endblock %}

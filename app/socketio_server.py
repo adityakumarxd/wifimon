@@ -1,5 +1,4 @@
-from app import socketio
-from flask_socketio import emit
+from .extensions import socketio
 
-def notify_traffic(data):
-    socketio.emit('new_traffic', data, broadcast=True)
+def notify_traffic(device_ip, data):
+    socketio.emit('new_traffic', data, room=device_ip)
