@@ -2,14 +2,14 @@ from flask import Flask
 from config import Config
 from threading import Thread
 from .traffic_sniffer import start_sniffer
-from .extensions import socketio         # Import socketio from extensions
-from .socketio_events import *            # Import event handlers
+from .extensions import socketio
+from .socketio_events import *
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    socketio.init_app(app)                # Initialize socketio here
+    socketio.init_app(app)
 
     from .routes import main_bp
     from .auth import auth_bp

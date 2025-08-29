@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file if present (for local development)
 load_dotenv()
 
 class Config:

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Live Traffic for {{ device_ip }}</h2>
+<h2>Live Network Traffic</h2>
 
 <input type="text" id="filterInput" placeholder="Filter requests..." oninput="filterRequests()" style="margin-bottom:10px; width:300px;">
 
@@ -9,25 +9,26 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
 <script>
-const deviceIP = "{{ device_ip }}";
 const socket = io();
 
-// Join the room for this device on connect
 socket.on('connect', () => {
-    socket.emit('join_room', deviceIP);
+    socket.emit('join_room', 'all');
 });
 
 socket.on('new_traffic', data => {
     const log = document.getElementById('traffic-log');
     const item = document.createElement('li');
     const time = new Date(data.timestamp * 1000).toLocaleTimeString();
-    item.textContent = `[${time}] ${data.method} ${data.path} --> ${data.dst_ip}`;
+    let text = `[${time}] ${data.method} ${data.path} from ${data.src_ip} to ${data.dst_ip}`;
+    if(data.method === 'SNI'){
+        text = `[${time}] HTTPS Domain: ${data.path} (src: ${data.src_ip})`;
+    }
+    item.textContent = text;
     item.setAttribute('data-text', item.textContent.toLowerCase());
     log.prepend(item);
     filterRequests();
 });
 
-// Simple text filter
 function filterRequests(){
     const input = document.getElementById('filterInput').value.toLowerCase();
     const items = document.getElementById('traffic-log').children;
