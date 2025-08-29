@@ -12,10 +12,8 @@ def create_app():
     socketio.init_app(app)
 
     from .routes import main_bp
-    from .auth import auth_bp
 
     app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp)
 
     Thread(target=start_sniffer, daemon=True).start()
 

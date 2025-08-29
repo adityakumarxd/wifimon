@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Live Network Traffic</h2>
+<div class="container">
+    <h2 class="page-title">Live Network Traffic</h2>
 
-<input type="text" id="filterInput" placeholder="Filter requests..." oninput="filterRequests()" style="margin-bottom:10px; width:300px;">
+    <input type="text" id="filterInput" placeholder="Filter requests..." oninput="filterRequests()" class="filter-input">
 
-<ul id="traffic-log" style="list-style:none; padding-left:0;"></ul>
+    <div class="log-box">
+        <ul id="traffic-log" class="traffic-list"></ul>
+    </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
 <script>

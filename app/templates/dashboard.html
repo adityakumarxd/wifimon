@@ -1,24 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Connected Devices</h2>
-<table border="1" cellpadding="5" cellspacing="0">
-    <tr>
-        <th>IP Address</th>
-        <th>MAC Address</th>
-        <th>Hostname</th>
-        <th>Vendor</th>
-        
-        <th>Details</th>
-    </tr>
+<h2 style="color:#6a0dad;">Connected Devices</h2>
+
+<table class="device-table">
+    <thead>
+        <tr>
+            <th>IP Address</th>
+            <th>MAC Address</th>
+            <th>Hostname</th>
+            <th>Vendor</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
     {% for device in devices %}
-    <tr>
-        <td>{{ device.ip }}</td>
-        <td>{{ device.mac }}</td>
-        <td>{{ device.vendor }}</td>
-        <td>{{ device.hostname or 'Unknown' }}</td>
-        <td><a href="{{ url_for('main.device_detail', ip=device.ip) }}">View Traffic</a></td>
-    </tr>
+        <tr class="device-row">
+            <td>{{ device.ip }}</td>
+            <td>{{ device.mac }}</td>
+            <td>{{ device.hostname or 'Unknown' }}</td>
+            <td>{{ device.vendor }}</td>
+            <td><a href="{{ url_for('main.device_detail', ip=device.ip) }}" class="details-link">View Traffic</a></td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
 {% endblock %}
