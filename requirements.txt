@@ -1,0 +1,6 @@
+Flask
+Flask-SocketIO
+requests
+scapy
+flask-login
+flask-cors

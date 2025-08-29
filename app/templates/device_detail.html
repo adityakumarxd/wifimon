@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <h1>Device Details</h1>
+    <div id="device-info">
+        <h2>{{ device.name }}</h2>
+        <p><strong>IP Address:</strong> {{ device.ip }}</p>
+        <p><strong>MAC Address:</strong> {{ device.mac }}</p>
+        <p><strong>Traffic Logs:</strong></p>
+        <ul>
+            {% for log in device.logs %}
+                <li>{{ log.timestamp }} - {{ log.details }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endblock %}
+</body>
+</html>
